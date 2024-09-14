@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using UZBWalks.Api.Data;
 using UZBWalks.Api.Models.Domain;
 using UZBWalks.Api.Models.DTO;
@@ -17,9 +18,9 @@ namespace UZBWalks.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var regionDomain = _dbConetxt.Regions.ToList();
+            var regionDomain = await _dbConetxt.Regions.ToListAsync();
 
             var regionsDto = new List<RegionDto>();
 
@@ -39,9 +40,9 @@ namespace UZBWalks.Api.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-        public IActionResult GetById([FromRoute] Guid id)
+        public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
-            var regionDomain = _dbConetxt.Regions.FirstOrDefault(c => c.Id == id);
+            var regionDomain = await _dbConetxt.Regions.FirstOrDefaultAsync(c => c.Id == id);
 
             if (regionDomain == null) NotFound();
 
@@ -57,7 +58,7 @@ namespace UZBWalks.Api.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] AddRegionRequestDto addRegion)
+        public async Task<IActionResult> Create([FromBody] AddRegionRequestDto addRegion)
         {
             var regionModel = new Region
             {
@@ -66,8 +67,8 @@ namespace UZBWalks.Api.Controllers
                 RegionImageUrl = addRegion.RegionImageUrl
             };
 
-            _dbConetxt.Regions.Add(regionModel);
-            _dbConetxt.SaveChanges();
+            await _dbConetxt.Regions.AddAsync(regionModel);
+            await _dbConetxt.SaveChangesAsync();
 
             var regionDto = new RegionDto
             {
@@ -82,9 +83,9 @@ namespace UZBWalks.Api.Controllers
 
         [HttpPut]
         [Route("{id:guid}")]
-        public IActionResult Update([FromRoute] Guid id, UpdateRegionRequestDto updateRegion)
+        public async Task<IActionResult> Update([FromRoute] Guid id, UpdateRegionRequestDto updateRegion)
         {
-            var regionDomain = _dbConetxt.Regions.FirstOrDefault(x => x.Id == id);
+            var regionDomain = await _dbConetxt.Regions.FirstOrDefaultAsync(x => x.Id == id);
 
             if(regionDomain == null) return NotFound();
 
@@ -92,7 +93,7 @@ namespace UZBWalks.Api.Controllers
             regionDomain.Name = updateRegion.Name;
             regionDomain.RegionImageUrl = updateRegion.RegionImageUrl;
 
-            _dbConetxt.SaveChanges();
+            await _dbConetxt.SaveChangesAsync();
 
             var regionDto = new RegionDto
             {
@@ -107,14 +108,14 @@ namespace UZBWalks.Api.Controllers
 
         [HttpDelete]
         [Route("{id:Guid}")]
-        public IActionResult Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            var regionDomain = _dbConetxt.Regions.FirstOrDefault(c => c.Id == id);
+            var regionDomain = await _dbConetxt.Regions.FirstOrDefaultAsync(c => c.Id == id);
 
             if(regionDomain == null) return NotFound();
 
             _dbConetxt.Remove(regionDomain);
-            _dbConetxt.SaveChanges();
+            await _dbConetxt.SaveChangesAsync();
 
             var regionDto = new RegionDto
             {
