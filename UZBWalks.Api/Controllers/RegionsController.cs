@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UZBWalks.Api.Data;
@@ -12,11 +13,11 @@ namespace UZBWalks.Api.Controllers
     [ApiController]
     public class RegionsController : ControllerBase
     {
-        private readonly UzbWalkDbContext _dbConetxt;
         private readonly IRegionRepository _regionRepository;
-        public RegionsController(UzbWalkDbContext dbContext, IRegionRepository regionRepository)
+        private readonly IMapper _mapper;
+        public RegionsController(IMapper mapper, IRegionRepository regionRepository)
         {
-            _dbConetxt = dbContext;
+            _mapper = mapper;
             _regionRepository = regionRepository;
         }
 
@@ -25,20 +26,20 @@ namespace UZBWalks.Api.Controllers
         {
             var regionDomain = await _regionRepository.GetAllAsync();
 
-            var regionsDto = new List<RegionDto>();
+            //var regionsDto = new List<RegionDto>();
 
-            foreach (var region in regionDomain)
-            {
-                regionsDto.Add(new RegionDto()
-                {
-                    Id = region.Id,
-                    Name = region.Name,
-                    Code = region.Code,
-                    RegionImageUrl = region.RegionImageUrl
-                });
-            }
+            //foreach (var region in regionDomain)
+            //{
+            //    regionsDto.Add(new RegionDto()
+            //    {
+            //        Id = region.Id,
+            //        Name = region.Name,
+            //        Code = region.Code,
+            //        RegionImageUrl = region.RegionImageUrl
+            //    });
+            //}
 
-            return Ok(regionsDto);
+            return Ok(_mapper.Map<List<RegionDto>>(regionDomain));
         }
 
         [HttpGet]
@@ -49,36 +50,17 @@ namespace UZBWalks.Api.Controllers
 
             if (regionDomain == null) NotFound();
 
-            var regionDto = new RegionDto
-            {
-                Id = regionDomain!.Id,
-                Name = regionDomain.Name,
-                Code = regionDomain.Code,
-                RegionImageUrl = regionDomain.RegionImageUrl
-            };
-
-            return Ok(regionDto);
+            return Ok(_mapper.Map<RegionDto>(regionDomain));
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] AddRegionRequestDto addRegion)
         {
-            var regionModel = new Region
-            {
-                Name = addRegion.Name,
-                Code = addRegion.Code,
-                RegionImageUrl = addRegion.RegionImageUrl
-            };
+            var regionModel = _mapper.Map<Region>(addRegion);
 
             regionModel = await _regionRepository.CreateAsync(regionModel);
 
-            var regionDto = new RegionDto
-            {
-                Id = regionModel.Id,
-                Name = regionModel.Name,
-                Code = regionModel.Code,
-                RegionImageUrl = regionModel.RegionImageUrl
-            };
+            var regionDto = _mapper.Map<RegionDto>(regionModel);
 
             return CreatedAtAction(nameof(GetById), new { id = regionDto.Id }, regionDto);
         }
@@ -87,24 +69,13 @@ namespace UZBWalks.Api.Controllers
         [Route("{id:guid}")]
         public async Task<IActionResult> Update([FromRoute] Guid id, UpdateRegionRequestDto updateRegion)
         {
-            var regionDomianModel = new Region
-            {
-                Code = updateRegion.Code,
-                RegionImageUrl = updateRegion.RegionImageUrl,
-                Name = updateRegion.Name,
-            };
+            var regionDomianModel = _mapper.Map<Region>(updateRegion);
 
             regionDomianModel = await _regionRepository.UpdateAsync(id, regionDomianModel);
 
             if(regionDomianModel == null) return NotFound();
 
-            var regionDto = new RegionDto
-            {
-                Id = regionDomianModel.Id,
-                Name = regionDomianModel.Name,
-                Code = regionDomianModel.Code,
-                RegionImageUrl = regionDomianModel.RegionImageUrl
-            };
+            var regionDto = _mapper.Map<RegionDto>(regionDomianModel);
 
             return Ok(regionDto);
         }
@@ -117,13 +88,7 @@ namespace UZBWalks.Api.Controllers
 
             if (regionDomain == null) return NotFound();
 
-            var regionDto = new RegionDto
-            {
-                Id = regionDomain.Id,
-                Name = regionDomain.Name,
-                Code = regionDomain.Code,
-                RegionImageUrl = regionDomain.RegionImageUrl
-            };
+            var regionDto = _mapper.Map<RegionDto>(regionDomain);
 
             return Ok(regionDto);
         }

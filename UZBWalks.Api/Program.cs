@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using UZBWalks.Api.Data;
+using UZBWalks.Api.Mapping;
 using UZBWalks.Api.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,8 @@ builder.Services.AddDbContext<UzbWalkDbContext>(options =>
 });
 
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
+
+builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
 
 var app = builder.Build();
 
