@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using UZBWalks.Api.Data;
+using UZBWalks.Api.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,8 @@ builder.Services.AddDbContext<UzbWalkDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("UzbWalksConnectionString"));
 });
+
+builder.Services.AddScoped<IRegionRepository, RegionRepository>();
 
 var app = builder.Build();
 
