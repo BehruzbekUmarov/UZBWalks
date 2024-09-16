@@ -21,10 +21,15 @@ namespace UZBWalks.Api.Controllers
             _mapper = mapper;
         }
 
+        // Get Walks
+        // Get: /api/walks?filterOn=Name&filterQuery=Track&sortBy=Name&isAcending=true&pageNumber=1&pageSize=10
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] string? filterOn, [FromQuery] string? filterQuery,
+            [FromQuery] string? sortBy, [FromQuery] bool? isAscending,
+            [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 1000)
         {
-            var walkDomain = await _walkRepository.GetAllAsync();
+            var walkDomain = await _walkRepository.GetAllAsync(filterOn,filterQuery,sortBy,isAscending?? true,
+                pageNumber,pageSize);
             if (walkDomain == null) return NotFound();
 
             return Ok(_mapper.Map<List<WalkDto>>(walkDomain));
