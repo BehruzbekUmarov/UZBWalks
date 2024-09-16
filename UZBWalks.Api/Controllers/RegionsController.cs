@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using UZBWalks.Api.CustomActionFilters;
 using UZBWalks.Api.Data;
 using UZBWalks.Api.Models.Domain;
 using UZBWalks.Api.Models.DTO;
@@ -26,18 +27,7 @@ namespace UZBWalks.Api.Controllers
         {
             var regionDomain = await _regionRepository.GetAllAsync();
 
-            //var regionsDto = new List<RegionDto>();
-
-            //foreach (var region in regionDomain)
-            //{
-            //    regionsDto.Add(new RegionDto()
-            //    {
-            //        Id = region.Id,
-            //        Name = region.Name,
-            //        Code = region.Code,
-            //        RegionImageUrl = region.RegionImageUrl
-            //    });
-            //}
+            if(regionDomain == null) return NotFound();
 
             return Ok(_mapper.Map<List<RegionDto>>(regionDomain));
         }
@@ -54,6 +44,7 @@ namespace UZBWalks.Api.Controllers
         }
 
         [HttpPost]
+        [ValidateModel]
         public async Task<IActionResult> Create([FromBody] AddRegionRequestDto addRegion)
         {
             var regionModel = _mapper.Map<Region>(addRegion);
@@ -67,6 +58,7 @@ namespace UZBWalks.Api.Controllers
 
         [HttpPut]
         [Route("{id:guid}")]
+        [ValidateModel]
         public async Task<IActionResult> Update([FromRoute] Guid id, UpdateRegionRequestDto updateRegion)
         {
             var regionDomianModel = _mapper.Map<Region>(updateRegion);
