@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using UZBWalks.Api.Models.DTO;
+using UZBWalks.Api.Repositories;
 
 namespace UZBWalks.Api.Controllers
 {
@@ -10,10 +11,12 @@ namespace UZBWalks.Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly ITokenRepository _tokenRepository;
 
-        public AuthController(UserManager<IdentityUser> userManager)
+        public AuthController(UserManager<IdentityUser> userManager, ITokenRepository tokenRepository)
         {
             _userManager = userManager;
+            _tokenRepository = tokenRepository;
         }
 
         [HttpPost]
@@ -33,7 +36,7 @@ namespace UZBWalks.Api.Controllers
                 // AddRoles To This User
                 if(registerRequestDto.Roles != null && registerRequestDto.Roles.Any())
                 {
-                    identityResult = await _userManager.AddToRoleAsync(identityUser, registerRequestDto.Roles);
+                    identityResult = await _userManager.AddToRolesAsync(identityUser, registerRequestDto.Roles);
 
                     if(identityResult.Succeeded)
                     {
@@ -58,9 +61,20 @@ namespace UZBWalks.Api.Controllers
 
                 if (checkPasswordResult)
                 {
-                    // Create Token
+                    // Get Roles for this user
+                    var roles = await _userManager.GetRolesAsync(user);
 
-                    return Ok();
+                    if (roles != null)
+                    {
+                        // Create Token
+                        var jwtToken = _tokenRepository.CreateJWTToken(user, roles.ToList());
+                        var response = new LoginResponseDto
+                        {
+                            JwtToken = jwtToken
+                        };
+
+                        return Ok(response);
+                    }                  
                 }
             }
 
