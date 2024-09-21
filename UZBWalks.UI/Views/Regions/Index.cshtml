@@ -1,0 +1,24 @@
+﻿@model IEnumerable<UZBWalks.UI.Models.DTO.RegionDto>
+
+@{
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Code</th>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var walk in Model)
+        {
+            <tr>
+                <td>@walk.Id</td>
+                <td>@walk.Code</td>
+                <td>@walk.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>

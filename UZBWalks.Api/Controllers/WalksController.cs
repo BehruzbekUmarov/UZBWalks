@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UZBWalks.Api.CustomActionFilters;
@@ -24,6 +25,7 @@ namespace UZBWalks.Api.Controllers
         // Get Walks
         // Get: /api/walks?filterOn=Name&filterQuery=Track&sortBy=Name&isAcending=true&pageNumber=1&pageSize=10
         [HttpGet]
+        [Authorize(Roles = "Reader,Writer")]
         public async Task<IActionResult> GetAll([FromQuery] string? filterOn, [FromQuery] string? filterQuery,
             [FromQuery] string? sortBy, [FromQuery] bool? isAscending,
             [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 1000)
@@ -37,6 +39,7 @@ namespace UZBWalks.Api.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = "Reader,Writer")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             var walkDomain = await _walkRepository.GetByIdAsync(id);
@@ -47,6 +50,7 @@ namespace UZBWalks.Api.Controllers
 
         [HttpPost]
         [ValidateModel]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> Create([FromBody] AddWalkRequestDto requestDto)
         {
             var walkDomain = _mapper.Map<Walk>(requestDto);
@@ -62,6 +66,7 @@ namespace UZBWalks.Api.Controllers
         [HttpPut]
         [Route("{id:Guid}")]
         [ValidateModel]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> Update([FromRoute] Guid id,[FromBody] UpdateWalkRequestDto requestDto)
         {
             var walkDomain = _mapper.Map<Walk>(requestDto);
@@ -74,6 +79,7 @@ namespace UZBWalks.Api.Controllers
 
         [HttpDelete]
         [Route("{id:Guid}")]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             var walkDomain = await _walkRepository.DeleteAsync(id);
