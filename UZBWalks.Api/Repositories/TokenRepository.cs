@@ -38,7 +38,6 @@ namespace UZBWalks.Api.Repositories
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
-
         }
     }
 }

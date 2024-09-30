@@ -45,7 +45,7 @@ namespace UZBWalks.Api.Controllers
                 }
             }
 
-            return BadRequest("Somthing went wrong");
+            return BadRequest("Something went wrong");
         }
 
         [HttpPost]
